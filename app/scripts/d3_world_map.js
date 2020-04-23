@@ -79,16 +79,16 @@ legend
   .attr('font-size', '12px')
   .attr('fill', 'hsla(0, 0%, 85%, .66)');
 
-legend
+const immigrationCircle = legend
   .append('circle')
   .attr('r', 12)
   .attr('cx', 20)
   .attr('cy', 595)
-  .attr('stroke', 'hsla(0, 100%, 85%, .366)')
+  .attr('stroke', 'hsla(0, 100%, 85%, .66)')
   .attr('stroke-width', '1px')
   .style('fill', 'hsla(0, 100%, 85%, .33)');
 
-legend
+const immigrationText = legend
   .append('text')
   .attr('x', 20)
   .attr('y', 590)
@@ -96,7 +96,8 @@ legend
   .attr('dy', -2)
   .text('Country of emigration')
   .attr('font-size', '12px')
-  .attr('fill', 'hsla(0, 100%, 85%, .66)');
+  .attr('fill', 'hsla(0, 0%, 85%, .66)');
+repeat();
 
 legend
   .append('text')
@@ -106,7 +107,7 @@ legend
   .attr('dy', 11)
   .text('Hover to display emigration info')
   .attr('font-size', '12px')
-  .attr('fill', 'hsla(0, 100%, 85%, .66)');
+  .attr('fill', 'hsla(0, 0%, 85%, .66)');
 
 legend
   .append('text')
@@ -116,7 +117,7 @@ legend
   .attr('dy', 24)
   .text('Click to access data points behind it')
   .attr('font-size', '12px')
-  .attr('fill', 'hsla(0, 100%, 85%, .66)');
+  .attr('fill', 'hsla(0, 0%, 85%, .66)');
 
 // moveToBack function: move an element from the front to the back
 d3.selection.prototype.moveToBack = function () {
@@ -438,4 +439,22 @@ function drawPath(path, origin, end) {
 // Data loading function
 function getData() {
   return d3.csv('../../data/CSV/migration_2015.csv');
+}
+
+function repeat() {
+  let random = Math.ceil(Math.random() * 240);
+  immigrationCircle
+    .transition()
+    .duration(1000)
+    .style('fill', `hsla(${random}, 100%, 85%, .33)`)
+    .attr('stroke', `hsla(${random}, 100%, 85%, .66)`)
+    .attr('stroke-width', '1px');
+
+  immigrationText
+    .transition()
+    .duration(1000)
+    .style('fill', `hsla(${random}, 100%, 85%, .33)`)
+    .attr('stroke', `hsla(${random}, 100%, 85%, .66)`)
+    .attr('stroke-width', '1px')
+    .on('end', repeat);
 }

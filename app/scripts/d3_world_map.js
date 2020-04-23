@@ -240,7 +240,6 @@ function displayEmigration(dest, origin, max, centroids) {
         .style('stroke-width', 3);
     }
   });
-
   // Remove previously existing data circles
   svg.selectAll('.emigration-data').remove();
 
@@ -268,7 +267,13 @@ function displayEmigration(dest, origin, max, centroids) {
     .transition()
     .duration(1000)
     .delay((d, i) => 500 + 5 * i)
-    .attr('r', (d) => (d[1] > 0 ? ((d[1] / max) * 100) / 2 + 3 : 0));
+    .attr('r', (d) => {
+      if (d[1] > 0) {
+        return ((d[1] / max) * 100) / 2 + 3;
+      } else {
+        return 0;
+      }
+    });
 }
 
 /*

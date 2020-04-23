@@ -176,8 +176,10 @@ d3.json('../../data/map/world_map.json').then((data) => {
       // Display legend
       svg.select('.legend').style('visibility', 'visible');
 
+      // Calculate the clicked country's centroid
       let center = getCentroid(country.split('_').join(' '), centroids);
 
+      // Call the data gathering function
       getMigration(csv_data, country, center, centroids);
     });
 });
@@ -348,10 +350,10 @@ function displayImmigration(immigration, emigration, origin) {
     .attr('fill', 'hsla(0, 0%, 85%, .66)');
 }
 
-// Data gathering function
 // Gathering migration data
 function getMigration(data, country, origin, centroids) {
   data.then((data) => {
+    // Gather emigration data
     let emigration = [];
     data.forEach((row) => {
       emigration.push([row.destination, Number(row[country])]);
@@ -359,6 +361,7 @@ function getMigration(data, country, origin, centroids) {
 
     let max = Math.max(...emigration.map((d) => d[1]));
 
+    // Gather immigration data
     let immigration;
     data.forEach((row) => {
       if (row.destination == country) {
@@ -373,10 +376,15 @@ function getMigration(data, country, origin, centroids) {
   });
 }
 
+// Gather information to display in the origin data circle
 function displayableMigrationData(data, immigrated) {
+  // Main variables
   let displayedMigration = '';
   let totalMigration = 0;
 
+  // Create an HTML-filled string with the name of the country
+  // And the number of people migrating either from or to it
+  // Count the total amount of people migrating
   data.forEach((t) => {
     if (Number(t[1]) > 0) {
       displayedMigration += `${immigrated ? 'From' : 'To'}

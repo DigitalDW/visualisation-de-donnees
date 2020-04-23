@@ -1,8 +1,13 @@
-svg {
-  background-color: rgb(15, 23, 41);
-}
 path {
   fill: rgb(27, 22, 17);
   stroke: black;
   stroke-opacity: 0.25;
+}
+
+path:hover {
+  fill: rgb(87, 62, 37);
+}
+
+body {
+  background-color: rgb(15, 23, 41);
 }

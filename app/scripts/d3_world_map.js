@@ -1,6 +1,6 @@
+const height = 800;
 const svg = d3.select('body').append('svg')
-  .attr('width', 1400).attr('height', 800)
-  .style('border', '1px black solid');
+  .attr('width', "100%").attr('height', height);
   
 const projection = d3.geoNaturalEarth1().scale(250).translate([700, 425]);
 const pathGenerator = d3.geoPath().projection(projection);
@@ -17,9 +17,16 @@ d3.json('../../data/map/world_map.json')
 
     // Create map
     const paths = svg.selectAll('path').data(features)
-      
+    
+    const tip = d3.tip()
+      .attr('class', 'd3-tip')
+      .html(d => `<span> ${d.properties.name} </span>`)
+
     paths.enter().append('path')
       .attr('d', pathGenerator)
+      .call(tip)
+      .on('mouseover', tip.show)
+      .on('mouseout', tip.hide)
       .on('click', (event) => {
         let country = event.properties.name.split(" ").join("_")
         let csv_data = getData();
@@ -71,6 +78,15 @@ function createLines(dest, center, max, centroids) {
     }
   })
 
+  const tip = d3.tip()
+    .attr('class', 'd3-tip')
+    .html((d, i) => `
+      <span style="color: hsla(${i}, 100%, 50%, .33)"> 
+        ${d[0].split("_").join(" ")} 
+      </span> : ${d[1]}`
+    )
+    .offset([-12, 0])
+
   svg.selectAll('.data').remove()
 
   svg.selectAll('.data').data(dest).enter().append('circle')
@@ -79,8 +95,9 @@ function createLines(dest, center, max, centroids) {
     .attr('cy', d => getCentroid(d[0].split("_").join(" "), centroids)[1])
     .attr('fill', (d, i) => `hsla(${i}, 100%, 50%, .33)`)
     .attr('r', 0)
-    .on("mouseover", (d, i) => circleMouseOver(d, i, getCentroid(d[0].split("_").join(" "), centroids)))
-    .on("mouseout", (d, i) => circleMouseOut(i, getCentroid(d[0].split("_").join(" "), centroids)))
+    .call(tip)
+    .on('mouseover', tip.show)
+    .on('mouseout', tip.hide)
     .transition()
       .duration(1000)
       .delay((d, i) => 500 + 5 * i)
@@ -95,20 +112,6 @@ function getCentroid(co, ce) {
     }
   });
   return center
-}
-
-function circleMouseOver(d, i, centroid) {
-  svg.append("text")
-    .attr("id", "t" + centroid[0][0] + "-" + centroid[1][0] + "-" + i)  // Create an id for text so we can select it later for removing on mouseout
-    .attr("x", centroid[0] - (d[0] + d[1]).length * 4.25)
-    .attr("y", centroid[1] - 10)
-    .attr('fill', 'white')
-    .text([d[0].split("_").join(" "), " " + d[1]]);
-}
-
-function circleMouseOut(i, centroid) {
-  // Select text by id and then remove
-  d3.select("#t" + centroid[1][0] + "-" + centroid[1][0] + "-" + i).remove();  // Remove text location
 }
 
 function getData() {

@@ -176,9 +176,9 @@ d3.json('../../data/map/world_map.json').then((data) => {
       // Display legend
       svg.select('.legend').style('visibility', 'visible');
 
-      // Call main data-driven functions
-      getEmigration(csv_data, country, centroids);
-      getImmigration(csv_data, country, centroids);
+      let center = getCentroid(country.split('_').join(' '), centroids);
+
+      getMigration(csv_data, country, center, centroids);
     });
 });
 
@@ -284,25 +284,10 @@ the circle displays a tooltip giving the total immigration into the origin.
 When clicked, the circle displays a detailed view of the countries from 
 which at least one person immigrated.
 */
-function displayImmigration(immigration, origin) {
+function displayImmigration(immigration, emigration, origin) {
   // Variables to display later
-  let displayedImmigration = '';
-  let total = 0;
-
-  // Preparing previous variables for display
-  immigration.forEach((t) => {
-    if (Number(t[1]) > 0) {
-      displayedImmigration += `
-        From ${t[0].split('_').join(' ')} : 
-        <span style="color: hsla(${immigration.indexOf(t)}, 100%, 50%, .33)">
-          ${Number(t[1]).toLocaleString('en')}
-        </span><br/>`;
-    } else {
-      displayedImmigration += '';
-    }
-    total += Number(t[1]);
-  });
-  total = total.toLocaleString('en');
+  let immigrationData = displayableMigrationData(immigration, true);
+  let emigrationData = displayableMigrationData(emigration, false);
 
   // Tooltip for the immigration data circle
   const immigrationTip = d3
@@ -311,7 +296,8 @@ function displayImmigration(immigration, origin) {
     .offset([-12, 0])
     .html(
       () =>
-        `Total immigration : <span style="color: hsla(0, 100%, 50%, .75);">${total}</span>`
+        `Total immigration : <span style="color: hsla(120, 100%, 50%, .75);">${immigrationData[1]}</span><br/>
+        Total emigration : <span style="color: hsla(0, 100%, 50%, .75);">${emigrationData[1]}</span>`
     );
 
   // Removeing previously existing immigration data circle
@@ -336,15 +322,24 @@ function displayImmigration(immigration, origin) {
         background: '#343a47',
         confirmButtonColor: '#474d5c',
         html: `<h3 style="color: #9ba7c2;"> Immigration to ${origin[2]} </h3>
-      <h5 style="color: #9ba7c2;"> Total immigration : ${total} </h5>
-      <div style="
-        overflow-y: scroll; 
-        height: 96px; 
-        font-size: 12px;
-        color: #9ba7c2;
-        background-color: #242830">
-        ${displayedImmigration}
-      </div>`,
+          <h5 style="color: #9ba7c2;"> Total immigration : ${immigrationData[1]} </h5>
+          <div style="
+            overflow-y: scroll; 
+            height: 96px; 
+            font-size: 12px;
+            color: #9ba7c2;
+            background-color: #242830">
+            ${immigrationData[0]}
+          </div>
+          <h5 style="color: #9ba7c2;"> Total emigration : ${emigrationData[1]} </h5>
+          <div style="
+            overflow-y: scroll; 
+            height: 96px; 
+            font-size: 12px;
+            color: #9ba7c2;
+            background-color: #242830">
+            ${emigrationData[0]}
+          </div>`,
       })
     )
     .transition()
@@ -353,38 +348,50 @@ function displayImmigration(immigration, origin) {
     .attr('fill', 'hsla(0, 0%, 85%, .66)');
 }
 
-// Data gathering functions
-// Gathering emigration data
-function getEmigration(data, country, centroids) {
+// Data gathering function
+// Gathering migration data
+function getMigration(data, country, origin, centroids) {
   data.then((data) => {
-    let destinations = [];
+    let emigration = [];
     data.forEach((row) => {
-      destinations.push([row.destination, Number(row[country])]);
+      emigration.push([row.destination, Number(row[country])]);
     });
 
-    let center = getCentroid(country.split('_').join(' '), centroids);
-    let max = Math.max(...destinations.map((d) => d[1]));
+    let max = Math.max(...emigration.map((d) => d[1]));
 
-    // Call the first major data-driven function
-    displayEmigration(destinations, center, max, centroids);
-  });
-}
-
-// Gathering immigration data
-function getImmigration(data, country, centroids) {
-  data.then((data) => {
     let immigration;
     data.forEach((row) => {
       if (row.destination == country) {
         immigration = Object.entries(row);
       }
     });
-    let center = getCentroid(country.split('_').join(' '), centroids);
     immigration.shift();
 
-    // Call the second major data-driven function
-    displayImmigration(immigration, center);
+    // Call major data-driven functions
+    displayEmigration(emigration, origin, max, centroids);
+    displayImmigration(immigration, emigration, origin);
   });
+}
+
+function displayableMigrationData(data, immigrated) {
+  let displayedMigration = '';
+  let totalMigration = 0;
+
+  data.forEach((t) => {
+    if (Number(t[1]) > 0) {
+      displayedMigration += `${immigrated ? 'From' : 'To'}
+        ${t[0].split('_').join(' ')} : 
+        <span style="color: hsla(${data.indexOf(t)}, 100%, 50%, .33)">
+          ${Number(t[1]).toLocaleString('en')}
+        </span><br/>`;
+    } else {
+      displayedMigration += '';
+    }
+    totalMigration += Number(t[1]);
+  });
+  totalMigration = totalMigration.toLocaleString('en');
+
+  return [displayedMigration, totalMigration];
 }
 
 // Function to iterate over dataset and returning centroid for corresponding country

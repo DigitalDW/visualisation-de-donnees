@@ -67,7 +67,8 @@ legend
   .attr('dy', -2)
   .text('Country of origin')
   .attr('font-size', '12px')
-  .attr('fill', 'hsla(0, 0%, 85%, .66)');
+  .attr('font-weight', 'bold')
+  .attr('fill', 'hsla(0, 0%, 100%, .66)');
 
 legend
   .append('text')

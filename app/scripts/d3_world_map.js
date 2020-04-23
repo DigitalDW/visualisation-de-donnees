@@ -442,6 +442,7 @@ function getData() {
   return d3.csv('../../data/CSV/migration_2015.csv');
 }
 
+// Repeat function for legend's circle and text
 function repeat() {
   let random = Math.ceil(Math.random() * 240);
   immigrationCircle

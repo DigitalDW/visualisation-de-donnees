@@ -1,6 +1,10 @@
+/* MIGRATION 2015 */
 /* eslint-disable no-undef */
+
+// Adding basic elements
 const body = d3.select('body');
 
+// Title Header
 const titleContainer = body
   .append('div')
   .attr('class', 'container')
@@ -16,6 +20,7 @@ titleContainer
   .style('margin', '0 auto')
   .style('color', '#7181a6');
 
+// Button header
 const buttonContainer = body
   .append('div')
   .attr('class', 'container')
@@ -37,9 +42,11 @@ buttonContainer
     svg.select('.legend').style('visibility', 'hidden');
   });
 
+// Adding svg
 const height = 650;
 const svg = body.append('svg').attr('width', '100%').attr('height', height);
 
+// Adding svg data-free elements
 const legend = svg
   .append('g')
   .attr('class', 'legend')
@@ -111,6 +118,7 @@ legend
   .attr('font-size', '12px')
   .attr('fill', 'hsla(0, 100%, 85%, .66)');
 
+// moveToBack function: move an element from the front to the back
 d3.selection.prototype.moveToBack = function () {
   return this.each(function () {
     let firstChild = this.parentNode.firstChild;
@@ -120,9 +128,11 @@ d3.selection.prototype.moveToBack = function () {
   });
 };
 
+// Main const for world map creation
 const projection = d3.geoNaturalEarth1().scale(250).translate([700, 375]);
 const pathGenerator = d3.geoPath().projection(projection);
 
+// Tooltip for emigration data circles
 const emigrationTip = d3
   .tip()
   .attr('class', 'd3-tip')
@@ -134,16 +144,18 @@ const emigrationTip = d3
     </span>`
   );
 
+// Creation of the world map
 d3.json('../../data/map/world_map.json').then((data) => {
   let features = data.features;
 
+  // Gathering country centroids
   let centroids = [];
   features.forEach((f) => {
     let centroid = pathGenerator.centroid(f);
     centroids.push([centroid[0], centroid[1], f.properties.name]);
   });
 
-  // Create map
+  // Generate map
   const paths = svg.selectAll('path').data(features);
 
   paths
@@ -157,17 +169,31 @@ d3.json('../../data/map/world_map.json').then((data) => {
     .on('mouseover', () => d3.select(event.target).style('fill', '#485470'))
     .on('mouseout', () => d3.select(event.target).style('fill', '#273147'))
     .on('click', (clicked) => {
+      // Return CSV promise
       let csv_data = getData();
       const country = clicked.properties.name.split(' ').join('_');
+
+      // Display legend
       svg.select('.legend').style('visibility', 'visible');
+
+      // Call main data-driven functions
       getEmigration(csv_data, country, centroids);
       getImmigration(csv_data, country, centroids);
     });
 });
 
+/* 
+First major data-driven function :
+displayEmigration() displays paths from the country of origin
+to countries where at least one person emigrated. Each of
+these countries are assigned a circle which, when hovered,
+display the emigration data from the origin to the emigration country
+*/
 function displayEmigration(dest, origin, max, centroids) {
+  // Deleting previously existing paths
   svg.selectAll('.emigration-line').remove();
 
+  // Create new paths according to the data
   let strokes = [];
   dest.forEach((e) => {
     strokes.push([
@@ -180,6 +206,7 @@ function displayEmigration(dest, origin, max, centroids) {
     ]);
   });
 
+  // Adding the paths to the svg
   svg
     .selectAll('.emigration-line')
     .data(dest)
@@ -195,6 +222,7 @@ function displayEmigration(dest, origin, max, centroids) {
     .style('stroke', (d, i) => `hsla(${i}, 100%, 50%, .33)`)
     .style('opacity', '0');
 
+  // Animating the paths
   d3.selectAll('.emigration-line').each((d, i) => {
     let totalLength = d3
       .select('#line' + i)
@@ -213,8 +241,10 @@ function displayEmigration(dest, origin, max, centroids) {
     }
   });
 
+  // Remove previously existing data circles
   svg.selectAll('.emigration-data').remove();
 
+  // Adding data circles
   svg
     .selectAll('.emigration-data')
     .data(dest)
@@ -227,6 +257,7 @@ function displayEmigration(dest, origin, max, centroids) {
     .attr('stroke', (d, i) => `hsla(${i}, 100%, 50%, .66)`)
     .attr('stroke-width', '1px')
     .attr('r', 0)
+    // Adding tooltip
     .call(emigrationTip)
     .on('mouseover', emigrationTip.show)
     .on('mouseout', emigrationTip.hide)
@@ -240,10 +271,20 @@ function displayEmigration(dest, origin, max, centroids) {
     .attr('r', (d) => (d[1] > 0 ? ((d[1] / max) * 100) / 2 + 3 : 0));
 }
 
+/*
+Second major data-driven function :
+displayImmigration() is simpler in that it displays a single circle
+at the country of origin (the one clicked by the user). When hovered,
+the circle displays a tooltip giving the total immigration into the origin.
+When clicked, the circle displays a detailed view of the countries from 
+which at least one person immigrated.
+*/
 function displayImmigration(immigration, origin) {
+  // Variables to display later
   let displayedImmigration = '';
   let total = 0;
 
+  // Preparing previous variables for display
   immigration.forEach((t) => {
     if (Number(t[1]) > 0) {
       displayedImmigration += `
@@ -258,6 +299,7 @@ function displayImmigration(immigration, origin) {
   });
   total = total.toLocaleString('en');
 
+  // Tooltip for the immigration data circle
   const immigrationTip = d3
     .tip()
     .attr('class', 'd3-tip')
@@ -267,8 +309,10 @@ function displayImmigration(immigration, origin) {
         `Total immigration : <span style="color: hsla(0, 100%, 50%, .75);">${total}</span>`
     );
 
+  // Removeing previously existing immigration data circle
   svg.selectAll('.immigration-data').remove();
 
+  // Adding immigration data circle
   svg
     .append('circle')
     .attr('class', 'immigration-data')
@@ -276,10 +320,12 @@ function displayImmigration(immigration, origin) {
     .attr('cy', origin[1])
     .attr('r', 0)
     .attr('fill', 'hsla(0, 0%, 0%, .0)')
+    // Adding tooltip
     .call(immigrationTip)
     .on('mouseover', immigrationTip.show)
     .on('mouseout', immigrationTip.hide)
     .on('click', () =>
+      // Creating modal to display immigration data
       swal.fire({
         icon: 'info',
         background: '#343a47',
@@ -302,6 +348,8 @@ function displayImmigration(immigration, origin) {
     .attr('fill', 'hsla(0, 0%, 85%, .66)');
 }
 
+// Data gathering functions
+// Gathering emigration data
 function getEmigration(data, country, centroids) {
   data.then((data) => {
     let destinations = [];
@@ -312,10 +360,12 @@ function getEmigration(data, country, centroids) {
     let center = getCentroid(country.split('_').join(' '), centroids);
     let max = Math.max(...destinations.map((d) => d[1]));
 
+    // Call the first major data-driven function
     displayEmigration(destinations, center, max, centroids);
   });
 }
 
+// Gathering immigration data
 function getImmigration(data, country, centroids) {
   data.then((data) => {
     let immigration;
@@ -327,10 +377,12 @@ function getImmigration(data, country, centroids) {
     let center = getCentroid(country.split('_').join(' '), centroids);
     immigration.shift();
 
+    // Call the second major data-driven function
     displayImmigration(immigration, center);
   });
 }
 
+// Function to iterate over dataset and returning centroid for corresponding country
 function getCentroid(co, ce) {
   let center;
   ce.forEach((t) => {
@@ -341,13 +393,15 @@ function getCentroid(co, ce) {
   return center;
 }
 
-function getData() {
-  return d3.csv('../../data/CSV/migration_2015.csv');
-}
-
+// Path creation function for data lines
 function drawPath(path, origin, end) {
   path.moveTo(origin[0], origin[1]);
   path.lineTo(end[0], end[1]);
   path.closePath();
   return path;
+}
+
+// Data loading function
+function getData() {
+  return d3.csv('../../data/CSV/migration_2015.csv');
 }

@@ -32,7 +32,7 @@ const buttonContainer = body
 
 buttonContainer
   .append('a')
-  .text('Reset points')
+  .text('Reset displayed data')
   .style('margin', '0 auto')
   .attr('class', 'button')
   .on('click', () => {
@@ -172,9 +172,6 @@ d3.json('../../data/map/world_map.json').then((data) => {
       // Return CSV promise
       let csv_data = getData();
       const country = clicked.properties.name.split(' ').join('_');
-
-      // Display legend
-      svg.select('.legend').style('visibility', 'visible');
 
       // Calculate the clicked country's centroid
       let center = getCentroid(country.split('_').join(' '), centroids);
@@ -368,11 +365,28 @@ function getMigration(data, country, origin, centroids) {
         immigration = Object.entries(row);
       }
     });
-    immigration.shift();
+    if (typeof immigration !== 'undefined') {
+      immigration.shift();
+    }
 
-    // Call major data-driven functions
-    displayEmigration(emigration, origin, max, centroids);
-    displayImmigration(immigration, emigration, origin);
+    if (!isNaN(max) || typeof immigration !== 'undefined') {
+      // Display legend
+      svg.select('.legend').style('visibility', 'visible');
+
+      // Call major data-driven functions
+      displayEmigration(emigration, origin, max, centroids);
+      displayImmigration(immigration, emigration, origin);
+    } else {
+      swal.fire({
+        icon: 'error',
+        background: '#343a47',
+        confirmButtonColor: '#474d5c',
+        html: `<h3 style="color: #9ba7c2;"> No data for ${country} </h3>
+          <h5 style="color: #9ba7c2;"> 
+            There is sadly no migration data provided by the U.N. for ${country} !
+          </h5>`,
+      });
+    }
   });
 }
 

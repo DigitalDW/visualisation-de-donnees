@@ -446,14 +446,14 @@ function repeat() {
   let random = Math.ceil(Math.random() * 240);
   immigrationCircle
     .transition()
-    .duration(1000)
+    .duration(2500)
     .style('fill', `hsla(${random}, 100%, 85%, .33)`)
     .attr('stroke', `hsla(${random}, 100%, 85%, .66)`)
     .attr('stroke-width', '1px');
 
   immigrationText
     .transition()
-    .duration(1000)
+    .duration(2500)
     .style('fill', `hsla(${random}, 100%, 85%, .33)`)
     .attr('stroke', `hsla(${random}, 100%, 85%, .66)`)
     .attr('stroke-width', '1px')

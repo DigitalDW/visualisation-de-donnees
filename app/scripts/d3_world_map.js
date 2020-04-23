@@ -51,7 +51,7 @@ legend.append('text')
   .attr('y', 550)
   .attr('dx', 27)
   .attr('dy', -2)
-  .text('country of origin')
+  .text('Country of origin')
   .attr('font-size', '12px')
   .attr('fill', 'hsla(0, 0%, 85%, .66)');
 
@@ -60,14 +60,14 @@ legend.append('text')
   .attr('y', 550)
   .attr('dx', 27)
   .attr('dy', 11)
-  .text('click to display immigration data')
+  .text('Click to display immigration data')
   .attr('font-size', '12px')
   .attr('fill', 'hsla(0, 0%, 85%, .66)');
 
 legend.append('circle')
   .attr('r', 12)
   .attr('cx', 20)
-  .attr('cy', 590)
+  .attr('cy', 595)
   .attr('stroke', 'hsla(0, 100%, 85%, .366)')
   .attr('stroke-width', '1px')
   .style('fill', 'hsla(0, 100%, 85%, .33)');
@@ -77,7 +77,7 @@ legend.append('text')
   .attr('y', 590)
   .attr('dx', 27)
   .attr('dy', -2)
-  .text('country of emigration')
+  .text('Country of emigration')
   .attr('font-size', '12px')
   .attr('fill', 'hsla(0, 100%, 85%, .66)');
 
@@ -86,9 +86,27 @@ legend.append('text')
   .attr('y', 590)
   .attr('dx', 27)
   .attr('dy', 11)
-  .text('hover to display emigration info')
+  .text('Hover to display emigration info')
   .attr('font-size', '12px')
   .attr('fill', 'hsla(0, 100%, 85%, .66)');
+
+legend.append('text')
+  .attr('x', 20)
+  .attr('y', 590)
+  .attr('dx', 27)
+  .attr('dy', 24)
+  .text('Click to access data points behind it')
+  .attr('font-size', '12px')
+  .attr('fill', 'hsla(0, 100%, 85%, .66)');
+
+d3.selection.prototype.moveToBack = function() {
+  return this.each(function() {
+    let firstChild = this.parentNode.firstChild;
+    if (firstChild) {
+        this.parentNode.insertBefore(this, firstChild);
+    }
+  });
+};
 
 const projection = d3.geoNaturalEarth1().scale(250).translate([700, 375]);
 const pathGenerator = d3.geoPath().projection(projection);
@@ -126,7 +144,7 @@ d3.json('../../data/map/world_map.json')
       .on('click', clicked => {
         let csv_data = getData();
         const country = clicked.properties.name.split(" ").join("_");
-        svg.select('.legend').style('visibility', 'visible')
+        svg.select('.legend').style('visibility', 'visible');
         getEmigration(csv_data, country, centroids);
         getImmigration(csv_data, country, centroids);
       })
@@ -179,6 +197,10 @@ function displayEmigration(dest, origin, max, centroids) {
     .call(emigrationTip)
     .on('mouseover', emigrationTip.show)
     .on('mouseout', emigrationTip.hide)
+    .on('click', () => {
+      d3.select(event.target).moveToBack();
+      d3.selectAll('.map').moveToBack();
+    })
     .transition()
       .duration(1000)
       .delay((d, i) => 500 + 5 * i)
@@ -227,7 +249,7 @@ function displayImmigration(immigration, origin) {
       <h5 style="color: #9ba7c2;"> Total immigration : ${total} </h5>
       <div style="
         overflow-y: scroll; 
-        height: 60px; 
+        height: 96px; 
         font-size: 12px;
         color: #9ba7c2;
         background-color: #242830">

@@ -1,13 +1,28 @@
-path {
-  fill: rgb(27, 22, 17);
-  stroke: black;
-  stroke-opacity: 0.25;
-}
-
-path:hover {
-  fill: rgb(87, 62, 37);
-}
-
 body {
-  background-color: rgb(15, 23, 41);
+  background-color: #121b2e;
+}
+
+.button {
+  color: #7181a6;
+  font-size: 10px;
+  text-transform: uppercase;
+  text-decoration: none;
+  background: hlsa(0, 0%, 0%, 0);
+  padding: 5px 10px 5px 10px;
+  border: 2px solid #7181a6;
+  display: inline-block;
+  transition: all 0.4s ease 0s;
+}
+
+.button:link {
+  text-decoration: none;
+}
+
+.button:hover {
+  text-decoration: none;
+  cursor: pointer;
+  color: #121b2e;
+  background: #7181a6;
+  border-color: #7181a6;
+  transition: all 0.4s ease 0s;
 }

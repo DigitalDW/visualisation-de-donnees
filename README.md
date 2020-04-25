@@ -30,4 +30,3 @@ You will notice that sometimes, especially in Africa and Europe, the emigration 
   * [D3-tip](https://github.com/caged/d3-tip)
 * [JQuery](https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js)
 * [SweetAlert2](https://sweetalert2.github.io/)
-

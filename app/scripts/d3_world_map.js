@@ -192,7 +192,9 @@ display the emigration data from the origin to the emigration country
 */
 function displayEmigration(dest, origin, max, centroids) {
   // Deleting previously existing paths
-  svg.selectAll('.emigration-line').remove();
+  svg.select('#emigration-lines').remove();
+
+  const emigrationLines = svg.append('g').attr('id', 'emigration-lines');
 
   // Create new paths according to the data
   let strokes = [];
@@ -208,7 +210,7 @@ function displayEmigration(dest, origin, max, centroids) {
   });
 
   // Adding the paths to the svg
-  svg
+  emigrationLines
     .selectAll('.emigration-line')
     .data(dest)
     .enter()
@@ -241,10 +243,12 @@ function displayEmigration(dest, origin, max, centroids) {
         .style('stroke-width', 3);
     }
   });
+
   // Remove previously existing data circles
-  svg.selectAll('#emigration-data').remove();
+  svg.select('#emigration-data').remove();
 
   const emigrationCircles = svg.append('g').attr('id', 'emigration-data');
+
   // Adding data circles
   emigrationCircles
     .selectAll('.emigration-data')

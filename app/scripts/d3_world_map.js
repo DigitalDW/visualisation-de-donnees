@@ -36,9 +36,9 @@ buttonContainer
   .style('margin', '0 auto')
   .attr('class', 'button')
   .on('click', () => {
-    svg.selectAll('.emigration-line').remove();
-    svg.selectAll('.emigration-data').remove();
-    svg.selectAll('.immigration-data').remove();
+    svg.select('#emigration-lines').remove();
+    svg.select('#emigration-data').remove();
+    svg.select('#immigration-data').remove();
     svg.select('.legend').style('visibility', 'hidden');
   });
 
@@ -251,11 +251,11 @@ function displayEmigration(dest, origin, max, centroids) {
 
   // Adding data circles
   emigrationCircles
-    .selectAll('.emigration-data')
+    .selectAll('.emigration-circle')
     .data(dest)
     .enter()
     .append('circle')
-    .attr('class', 'emigration-data')
+    .attr('class', 'emigration-circle')
     .attr('cx', (d) => getCentroid(d[0].split('_').join(' '), centroids)[0])
     .attr('cy', (d) => getCentroid(d[0].split('_').join(' '), centroids)[1])
     .attr('fill', (d, i) => `hsla(${i}, 100%, 50%, .33)`)

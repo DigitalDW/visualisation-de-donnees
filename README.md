@@ -22,7 +22,7 @@ From that white circle depart a number of path directed to the centroids of ever
 
 You will notice that sometimes, especially in Africa and Europe, the emigration circles tend to overlap each other, making it hard, or even impossible, to access some circles' data. However, if clicked, the colored circles will be send to the back of the other circles.
 
-## Dependencies
+## Packages
 * [BootStrap](https://getbootstrap.com/)
 * [D3](https://d3js.org/)
   * [D3-geo-projection v2](https://github.com/d3/d3-geo-projection)

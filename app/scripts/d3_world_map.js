@@ -242,10 +242,11 @@ function displayEmigration(dest, origin, max, centroids) {
     }
   });
   // Remove previously existing data circles
-  svg.selectAll('.emigration-data').remove();
+  svg.selectAll('#emigration-data').remove();
 
+  const emigrationCircles = svg.append('g').attr('id', 'emigration-data');
   // Adding data circles
-  svg
+  emigrationCircles
     .selectAll('.emigration-data')
     .data(dest)
     .enter()

@@ -322,7 +322,7 @@ function displayImmigration(immigration, emigration, origin) {
         icon: 'info',
         background: '#343a47',
         confirmButtonColor: '#474d5c',
-        html: `<h3 style="color: #9ba7c2;"> Immigration to ${origin[2]} </h3>
+        html: `<h3 style="color: #9ba7c2;"> Migration data for ${origin[2]} </h3>
           <h5 style="color: #9ba7c2;"> Total immigration : ${immigrationData[1]} </h5>
           <div style="
             overflow-y: scroll; 

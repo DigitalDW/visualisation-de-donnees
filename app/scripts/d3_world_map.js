@@ -307,12 +307,12 @@ function displayImmigration(immigration, emigration, origin) {
     );
 
   // Removeing previously existing immigration data circle
-  svg.selectAll('.immigration-data').remove();
+  svg.select('#immigration-data').remove();
 
   // Adding immigration data circle
   svg
     .append('circle')
-    .attr('class', 'immigration-data')
+    .attr('id', 'immigration-data')
     .attr('cx', origin[0])
     .attr('cy', origin[1])
     .attr('r', 0)

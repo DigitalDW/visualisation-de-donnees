@@ -158,9 +158,10 @@ d3.json('../../data/map/world_map.json').then((data) => {
   });
 
   // Generate map
-  const paths = svg.selectAll('path').data(features);
 
-  paths
+  svg
+    .selectAll('path')
+    .data(features)
     .enter()
     .append('path')
     .attr('class', 'map')
@@ -170,17 +171,7 @@ d3.json('../../data/map/world_map.json').then((data) => {
     .style('stroke-opacity', '0.25')
     .on('mouseover', () => d3.select(event.target).style('fill', '#485470'))
     .on('mouseout', () => d3.select(event.target).style('fill', '#273147'))
-    .on('click', (clicked) => {
-      // Return CSV promise
-      let csv_data = getData();
-      const country = clicked.properties.name.split(' ').join('_');
-
-      // Calculate the clicked country's centroid
-      let center = getCentroid(country.split('_').join(' '), centroids);
-
-      // Call the data gathering function
-      getMigration(csv_data, country, center, centroids);
-    });
+    .on('click', (clicked) => generateDataDisplay(clicked, centroids));
 });
 
 /* 
@@ -352,6 +343,18 @@ function displayImmigration(immigration, emigration, origin) {
     .duration(500)
     .attr('r', 12)
     .attr('fill', 'hsla(0, 0%, 85%, .66)');
+}
+
+function generateDataDisplay(element, centroids) {
+  // Return CSV promise
+  let csv_data = getData();
+  const country = element.properties.name.split(' ').join('_');
+
+  // Calculate the clicked country's centroid
+  let center = getCentroid(country.split('_').join(' '), centroids);
+
+  // Call the data gathering function
+  getMigration(csv_data, country, center, centroids);
 }
 
 // Gathering migration data

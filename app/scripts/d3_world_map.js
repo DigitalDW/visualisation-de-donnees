@@ -114,44 +114,16 @@ d3.selection.prototype.moveToFront = function () {
 };
 
 // Main const for world map creation
-const projection = d3.geoNaturalEarth1().scale(250).translate([700, 375]);
+const projection = d3
+  .geoNaturalEarth1()
+  .scale(250)
+  .translate([0.5 * window.innerWidth, 375]);
 const pathGenerator = d3.geoPath().projection(projection);
 
 const worldMapDiasplay = svg.append('g');
 const map = worldMapDiasplay.append('g').attr('id', 'map');
 const emLines = worldMapDiasplay.append('g').attr('id', 'emigration-lines');
 const emCircles = worldMapDiasplay.append('g').attr('id', 'emigration-data');
-
-function zoomed() {
-  worldMapDiasplay.attr('transform', d3.event.transform);
-}
-
-function reset() {
-  svg.transition(750).call(zoom.transform, d3.zoomIdentity);
-  removeDisplayedItems();
-}
-
-function removeDisplayedItems() {
-  emLines.selectAll('.emigration-line').each((d, i) => {
-    let totalLength = d3
-      .select('#line' + i)
-      .node()
-      .getTotalLength();
-    d3.selectAll('#line' + i)
-      .transition(750)
-      .attr('stroke-dashoffset', totalLength)
-      .style('opacity', 0)
-      .remove();
-  });
-  emCircles
-    .selectAll('.emigration-circle')
-    .transition(750)
-    .style('opacity', 0)
-    .attr('r', 0)
-    .remove();
-  d3.select('#immigration-data').transition(750).style('opacity', 0).remove();
-  legend.style('visibility', 'hidden');
-}
 
 // Tooltip for emigration data circles
 const emigrationTip = d3
@@ -485,4 +457,35 @@ function repeat() {
     .attr('stroke', `hsla(${random}, 100%, 85%, .66)`)
     .attr('stroke-width', '1px')
     .on('end', repeat);
+}
+
+function zoomed() {
+  worldMapDiasplay.attr('transform', d3.event.transform);
+}
+
+function reset() {
+  svg.transition(1500).call(zoom.transform, d3.zoomIdentity);
+  removeDisplayedItems();
+}
+
+function removeDisplayedItems() {
+  emLines.selectAll('.emigration-line').each((d, i) => {
+    let totalLength = d3
+      .select('#line' + i)
+      .node()
+      .getTotalLength();
+    d3.selectAll('#line' + i)
+      .transition(1500)
+      .attr('stroke-dashoffset', totalLength)
+      .style('opacity', 0)
+      .remove();
+  });
+  emCircles
+    .selectAll('.emigration-circle')
+    .transition(1500)
+    .style('opacity', 0)
+    .attr('r', 0)
+    .remove();
+  d3.select('#immigration-data').transition(1500).style('opacity', 0).remove();
+  legend.style('visibility', 'hidden');
 }

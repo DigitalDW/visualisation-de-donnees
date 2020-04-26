@@ -4,47 +4,34 @@
 // Adding basic elements
 const body = d3.select('body');
 
-// Title Header
-const titleContainer = body
-  .append('div')
-  .attr('class', 'container')
-  .style('display', 'flex')
-  .style('width', '100%')
-  .style('align-items', 'center')
-  .style('justifiy-content', 'center')
-  .style('padding-top', '7px');
-
-titleContainer
-  .append('h1')
-  .text('Migrations 2015')
-  .style('margin', '0 auto')
-  .style('color', '#7181a6');
-
-// Button header
-const buttonContainer = body
-  .append('div')
-  .attr('class', 'container')
-  .style('display', 'flex')
-  .style('width', '100%')
-  .style('align-items', 'center')
-  .style('justifiy-content', 'center')
-  .style('padding-top', '5px');
-
-buttonContainer
+// Button
+d3.select('#reset')
   .append('a')
   .text('Reset displayed data')
-  .style('margin', '0 auto')
-  .attr('class', 'button')
+  .attr('class', 'button container-content')
   .on('click', () => {
-    svg.select('#emigration-lines').remove();
-    svg.select('#emigration-data').remove();
-    svg.select('#immigration-data').remove();
-    svg.select('.legend').style('visibility', 'hidden');
+    emLines.selectAll('.emigration-line').remove();
+    emCircles.selectAll('.emigration-circle').remove();
+    d3.select('#immigration-data').remove();
+    legend.style('visibility', 'hidden');
+    worldMapDiasplay
+      .transition()
+      .duration(750)
+      .call(
+        zoom.transform,
+        d3.zoomIdentity,
+        d3.zoomTransform(svg.node()).invert([1400 / 2, height / 2])
+      );
   });
 
 // Adding svg
 const height = 650;
-const svg = body.append('svg').attr('width', '100%').attr('height', height);
+const svg = d3
+  .select('#map')
+  .append('svg')
+  .attr('width', '100%')
+  .attr('height', height)
+  .call(d3.zoom().scaleExtent([1, 40]).on('zoom', zoom));
 
 // Adding svg data-free elements
 const legend = svg
@@ -130,9 +117,24 @@ d3.selection.prototype.moveToBack = function () {
   });
 };
 
+d3.selection.prototype.moveToFront = function () {
+  return this.each(function () {
+    this.parentNode.appendChild(this);
+  });
+};
+
 // Main const for world map creation
 const projection = d3.geoNaturalEarth1().scale(250).translate([700, 375]);
 const pathGenerator = d3.geoPath().projection(projection);
+
+const worldMapDiasplay = svg.append('g');
+const map = worldMapDiasplay.append('g').attr('id', 'map');
+const emLines = worldMapDiasplay.append('g').attr('id', 'emigration-lines');
+const emCircles = worldMapDiasplay.append('g').attr('id', 'emigration-data');
+
+function zoom() {
+  worldMapDiasplay.attr('transform', d3.event.transform);
+}
 
 // Tooltip for emigration data circles
 const emigrationTip = d3
@@ -159,7 +161,7 @@ d3.json('../../data/map/world_map.json').then((data) => {
 
   // Generate map
 
-  svg
+  map
     .selectAll('path')
     .data(features)
     .enter()
@@ -171,7 +173,10 @@ d3.json('../../data/map/world_map.json').then((data) => {
     .style('stroke-opacity', '0.25')
     .on('mouseover', () => d3.select(event.target).style('fill', '#485470'))
     .on('mouseout', () => d3.select(event.target).style('fill', '#273147'))
-    .on('click', (clicked) => generateDataDisplay(clicked, centroids));
+    .on('click', (clicked) => {
+      legend.moveToFront();
+      generateDataDisplay(clicked, centroids);
+    });
 });
 
 /* 
@@ -183,9 +188,7 @@ display the emigration data from the origin to the emigration country
 */
 function displayEmigration(dest, origin, max, centroids) {
   // Deleting previously existing paths
-  svg.select('#emigration-lines').remove();
-
-  const emigrationLines = svg.append('g').attr('id', 'emigration-lines');
+  emLines.selectAll('.emigration-line').remove();
 
   // Create new paths according to the data
   let strokes = [];
@@ -201,7 +204,7 @@ function displayEmigration(dest, origin, max, centroids) {
   });
 
   // Adding the paths to the svg
-  emigrationLines
+  let emigrationLines = emLines
     .selectAll('.emigration-line')
     .data(dest)
     .enter()
@@ -217,7 +220,7 @@ function displayEmigration(dest, origin, max, centroids) {
     .style('opacity', '0');
 
   // Animating the paths
-  d3.selectAll('.emigration-line').each((d, i) => {
+  emigrationLines.each((d, i) => {
     let totalLength = d3
       .select('#line' + i)
       .node()
@@ -236,12 +239,10 @@ function displayEmigration(dest, origin, max, centroids) {
   });
 
   // Remove previously existing data circles
-  svg.select('#emigration-data').remove();
-
-  const emigrationCircles = svg.append('g').attr('id', 'emigration-data');
+  emCircles.selectAll('.emigration-circle').remove();
 
   // Adding data circles
-  emigrationCircles
+  emCircles
     .selectAll('.emigration-circle')
     .data(dest)
     .enter()
@@ -301,7 +302,7 @@ function displayImmigration(immigration, emigration, origin) {
   svg.select('#immigration-data').remove();
 
   // Adding immigration data circle
-  svg
+  worldMapDiasplay
     .append('circle')
     .attr('id', 'immigration-data')
     .attr('cx', origin[0])

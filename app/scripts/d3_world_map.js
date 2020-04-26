@@ -464,7 +464,7 @@ function zoomed() {
 }
 
 function reset() {
-  svg.transition(1500).call(zoom.transform, d3.zoomIdentity);
+  svg.transition().duration(2500).call(zoom.transform, d3.zoomIdentity);
   removeDisplayedItems();
 }
 
@@ -475,17 +475,19 @@ function removeDisplayedItems() {
       .node()
       .getTotalLength();
     d3.selectAll('#line' + i)
-      .transition(1500)
+      .transition()
+      .duration(2500)
       .attr('stroke-dashoffset', totalLength)
       .style('opacity', 0)
       .remove();
   });
   emCircles
     .selectAll('.emigration-circle')
-    .transition(1500)
+    .transition()
+    .duration(2500)
     .style('opacity', 0)
     .attr('r', 0)
     .remove();
-  d3.select('#immigration-data').transition(1500).style('opacity', 0).remove();
+  d3.select('#immigration-data').transition().duration(2500).style('opacity', 0).remove();
   legend.style('visibility', 'hidden');
 }

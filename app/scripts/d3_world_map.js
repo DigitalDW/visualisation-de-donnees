@@ -9,29 +9,17 @@ d3.select('#reset')
   .append('a')
   .text('Reset displayed data')
   .attr('class', 'button container-content')
-  .on('click', () => {
-    emLines.selectAll('.emigration-line').remove();
-    emCircles.selectAll('.emigration-circle').remove();
-    d3.select('#immigration-data').remove();
-    legend.style('visibility', 'hidden');
-    worldMapDiasplay
-      .transition()
-      .duration(750)
-      .call(
-        zoom.transform,
-        d3.zoomIdentity,
-        d3.zoomTransform(svg.node()).invert([1400 / 2, height / 2])
-      );
-  });
+  .on('click', reset);
 
 // Adding svg
+const zoom = d3.zoom().scaleExtent([1, 40]).on('zoom', zoomed);
 const height = 650;
 const svg = d3
   .select('#map')
   .append('svg')
   .attr('width', '100%')
   .attr('height', height)
-  .call(d3.zoom().scaleExtent([1, 40]).on('zoom', zoom));
+  .call(zoom);
 
 // Adding svg data-free elements
 const legend = svg
@@ -107,6 +95,8 @@ legend
   .attr('font-size', '12px')
   .attr('fill', 'hsla(0, 0%, 85%, .66)');
 
+legend.attr('transform', 'translate(0, -20)');
+
 // moveToBack function: move an element from the front to the back
 d3.selection.prototype.moveToBack = function () {
   return this.each(function () {
@@ -132,8 +122,35 @@ const map = worldMapDiasplay.append('g').attr('id', 'map');
 const emLines = worldMapDiasplay.append('g').attr('id', 'emigration-lines');
 const emCircles = worldMapDiasplay.append('g').attr('id', 'emigration-data');
 
-function zoom() {
+function zoomed() {
   worldMapDiasplay.attr('transform', d3.event.transform);
+}
+
+function reset() {
+  svg.transition(750).call(zoom.transform, d3.zoomIdentity);
+  removeDisplayedItems();
+}
+
+function removeDisplayedItems() {
+  emLines.selectAll('.emigration-line').each((d, i) => {
+    let totalLength = d3
+      .select('#line' + i)
+      .node()
+      .getTotalLength();
+    d3.selectAll('#line' + i)
+      .transition(750)
+      .attr('stroke-dashoffset', totalLength)
+      .style('opacity', 0)
+      .remove();
+  });
+  emCircles
+    .selectAll('.emigration-circle')
+    .transition(750)
+    .style('opacity', 0)
+    .attr('r', 0)
+    .remove();
+  d3.select('#immigration-data').transition(750).style('opacity', 0).remove();
+  legend.style('visibility', 'hidden');
 }
 
 // Tooltip for emigration data circles

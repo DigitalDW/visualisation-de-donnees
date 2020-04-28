@@ -1,5 +1,6 @@
 # 2015 migration data visualisation
 ### A simple d3 document that uses the U.N.'s 2015 migration data and displays it on a geoJSON world map.
+### [Try it out!](https://digitaldw.github.io/visualisation-de-donnees/app/html/index.html)
 
 ![](images/main_view.png)
 *Main view after clicking on a country*

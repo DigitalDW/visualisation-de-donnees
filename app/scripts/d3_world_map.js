@@ -4,10 +4,17 @@
 // Adding basic elements
 const body = d3.select('body');
 
-// Button
-d3.select('#reset')
+// Buttons
+d3.select('#resetData')
   .append('a')
-  .text('Reset displayed data')
+  .text('Reset data')
+  .attr('class', 'button container-content')
+  .on('click', removeDisplayedItems);
+
+
+d3.select('#resetEverything')
+  .append('a')
+  .text('Reset map & data')
   .attr('class', 'button container-content')
   .on('click', reset);
 
@@ -249,7 +256,7 @@ function displayEmigration(dest, origin, max, centroids) {
     .on('mouseout', emigrationTip.hide)
     .on('click', () => {
       d3.select(event.target).moveToBack();
-      d3.selectAll('.map').moveToBack();
+      map.moveToBack();
     })
     .transition()
     .duration(1000)
@@ -478,16 +485,14 @@ function removeDisplayedItems() {
       .transition()
       .duration(2500)
       .attr('stroke-dashoffset', totalLength)
-      .style('opacity', 0)
       .remove();
   });
   emCircles
     .selectAll('.emigration-circle')
     .transition()
     .duration(2500)
-    .style('opacity', 0)
     .attr('r', 0)
     .remove();
-  d3.select('#immigration-data').transition().duration(2500).style('opacity', 0).remove();
+  d3.select('#immigration-data').transition().duration(2500).remove();
   legend.style('visibility', 'hidden');
 }

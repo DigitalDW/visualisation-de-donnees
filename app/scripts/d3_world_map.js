@@ -5,17 +5,18 @@
 const body = d3.select('body');
 
 // Buttons
-d3.select('#resetData')
+const buttons = d3.select('#buttons')
+buttons
   .append('a')
   .text('Reset data')
-  .attr('class', 'button container-content')
+  .attr('class', 'button')
   .on('click', removeDisplayedItems);
 
-
-d3.select('#resetEverything')
+buttons
   .append('a')
   .text('Reset map & data')
-  .attr('class', 'button container-content')
+  .attr('class', 'button')
+  .style('margin-left', '10px')
   .on('click', reset);
 
 // Adding svg
@@ -471,7 +472,7 @@ function zoomed() {
 }
 
 function reset() {
-  svg.transition().duration(2500).call(zoom.transform, d3.zoomIdentity);
+  svg.transition().duration(1500).call(zoom.transform, d3.zoomIdentity);
   removeDisplayedItems();
 }
 
@@ -483,16 +484,16 @@ function removeDisplayedItems() {
       .getTotalLength();
     d3.selectAll('#line' + i)
       .transition()
-      .duration(2500)
+      .duration(1000)
       .attr('stroke-dashoffset', totalLength)
       .remove();
   });
   emCircles
     .selectAll('.emigration-circle')
     .transition()
-    .duration(2500)
+    .duration(1000)
     .attr('r', 0)
     .remove();
-  d3.select('#immigration-data').transition().duration(2500).remove();
+  d3.select('#immigration-data').transition().duration(1000).remove();
   legend.style('visibility', 'hidden');
 }

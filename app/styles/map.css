@@ -39,3 +39,17 @@ body {
   margin: 0 auto;
   color: #7181a6;
 }
+
+#source {
+  margin: 10px;
+  color: #7181a6;
+}
+
+#source-link {
+  color: #7181a6;
+  text-decoration: underline;
+}
+
+#source-link:hover {
+  color: #39455f;
+}

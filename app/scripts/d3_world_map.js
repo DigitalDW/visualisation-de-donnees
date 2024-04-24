@@ -183,7 +183,7 @@ to countries where at least one person emigrated. Each of
 these countries are assigned a circle which, when hovered,
 display the emigration data from the origin to the emigration country
 */
-function displayEmigration(dest, origin, max, centroids) {
+function displayEmigration(dest, origin, max, min, centroids) {
   // Deleting previously existing paths
   emLines.selectAll('.emigration-line').remove();
 
@@ -238,6 +238,8 @@ function displayEmigration(dest, origin, max, centroids) {
   // Remove previously existing data circles
   emCircles.selectAll('.emigration-circle').remove();
 
+  const circle_r_scale = d3.scaleSqrt([min, max], [2, 50])
+
   // Adding data circles
   emCircles
     .selectAll('.emigration-circle')
@@ -262,13 +264,7 @@ function displayEmigration(dest, origin, max, centroids) {
     .transition()
     .duration(1000)
     .delay((d, i) => 500 + 5 * i)
-    .attr('r', (d) => {
-      if (d[1] > 0) {
-        return ((d[1] / max) * 100) / 2 + 3;
-      } else {
-        return 0;
-      }
-    });
+    .attr('r', (d) =>  d[1] > 0 ? circle_r_scale(d[1]) : 0);
 }
 
 /*
@@ -364,7 +360,19 @@ function getMigration(data, country, origin, centroids) {
       emigration.push([row.destination, Number(row[country])]);
     });
 
-    let max = Math.max(...emigration.map((d) => d[1]));
+    const flatten_data_values = data.map(row => {
+      const out = []
+      for (const [k, v] of Object.entries(row)) {
+        if (!isNaN(Number(v))) out.push(Number(v))
+      }
+      return out
+    }).flat()
+
+    // let max = Math.max(...emigration.map((d) => d[1]));
+    // let min = Math.min(...emigration.filter((d) => d[1] > 0).map((d) => d[1]));
+
+    let max = Math.max(...flatten_data_values);
+    let min = Math.min(...flatten_data_values.filter((val) => val > 0));
 
     // Gather immigration data
     let immigration;
@@ -382,7 +390,7 @@ function getMigration(data, country, origin, centroids) {
       svg.select('.legend').style('visibility', 'visible');
 
       // Call major data-driven functions
-      displayEmigration(emigration, origin, max, centroids);
+      displayEmigration(emigration, origin, max, min, centroids);
       displayImmigration(immigration, emigration, origin);
     } else {
       swal.fire({

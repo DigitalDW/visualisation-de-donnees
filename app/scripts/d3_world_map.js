@@ -199,6 +199,7 @@ function displayEmigration(dest, origin, max, min, centroids) {
       e[0],
     ]);
   });
+  console.log(strokes)
 
   // Adding the paths to the svg
   let emigrationLines = emLines
@@ -368,11 +369,11 @@ function getMigration(data, country, origin, centroids) {
       return out
     }).flat()
 
-    // let max = Math.max(...emigration.map((d) => d[1]));
-    // let min = Math.min(...emigration.filter((d) => d[1] > 0).map((d) => d[1]));
+    let max = Math.max(...emigration.map((d) => d[1]));
+    let min = Math.min(...emigration.filter((d) => d[1] > 0).map((d) => d[1]));
 
-    let max = Math.max(...flatten_data_values);
-    let min = Math.min(...flatten_data_values.filter((val) => val > 0));
+    // let max = Math.max(...flatten_data_values);
+    // let min = Math.min(...flatten_data_values.filter((val) => val > 0));
 
     // Gather immigration data
     let immigration;
@@ -447,7 +448,6 @@ function getCentroid(co, ce) {
 function drawPath(path, origin, end) {
   path.moveTo(origin[0], origin[1]);
   path.lineTo(end[0], end[1]);
-  path.closePath();
   return path;
 }
 
